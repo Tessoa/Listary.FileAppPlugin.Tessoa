@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <LangVersion>9.0</LangVersion>
+    <AssemblyName>Listary.FileAppPlugin.Tessoa</AssemblyName>
+    <RootNamespace>Listary.FileAppPlugin.Tessoa</RootNamespace>
+    <Company>Tessoa</Company>
+    <Product>Listary file application plugin for tessoa</Product>
+    <Copyright>Copyright (c) Tessoa</Copyright>
+    <Version>0.1.0</Version>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Listary.FileAppPlugin" Version="1.0.0" />
+    <!-- Reference assemblies for .NET Framework 4.8, so `dotnet build` works without Visual Studio. -->
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="ListaryPluginManifest.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Icon.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

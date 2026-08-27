@@ -1,0 +1,16 @@
+{
+  "ManifestVersion": 1,
+
+  "Id": "Tessoa",
+  "PluginType": "FileAppPlugin",
+  "PluginVersion": "0.1.0",
+  "DisplayName": "tessoa",
+  "Authors": [ "Tessoa" ],
+  "Description": "Listary file application plugin for tessoa, a GPU-accelerated file manager for Windows.",
+  "Homepage": "https://github.com/Tessoa/tessoa-listary",
+  "Icon": "Icon.png",
+
+  "Api": "NetFramework",
+  "ApiVersion": 1,
+  "Entry": "Listary.FileAppPlugin.Tessoa.dll"
+}
