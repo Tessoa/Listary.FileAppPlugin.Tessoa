@@ -14,11 +14,13 @@ namespace Listary.FileAppPlugin.Tessoa
     /// </summary>
     public class TessoaTab : IFileTab, IGetFolder
     {
+        private readonly IFileAppPluginHost _host;
         private readonly IntPtr _hWnd;
         private readonly int _processId;
 
-        public TessoaTab(IntPtr hWnd, int processId)
+        public TessoaTab(IFileAppPluginHost host, IntPtr hWnd, int processId)
         {
+            _host = host;
             _hWnd = hWnd;
             _processId = processId;
         }
@@ -27,9 +29,11 @@ namespace Listary.FileAppPlugin.Tessoa
         /// The folder shown in this tab, or an empty string when there is none to report: the start
         /// page, This PC, a preview or terminal tab, or the inside of an archive.
         /// </returns>
-        public Task<string> GetCurrentFolder()
+        public async Task<string> GetCurrentFolder()
         {
-            return TessoaQuery.GetCurrentFolder(_processId, _hWnd);
+            string folder = await TessoaQuery.GetCurrentFolder(_processId, _hWnd);
+            PluginLog.Trace(_host?.Logger, "GetCurrentFolder({Handle}) -> '{Folder}'", _hWnd, folder);
+            return folder;
         }
     }
 }

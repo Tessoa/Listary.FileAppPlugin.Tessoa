@@ -1,6 +1,5 @@
 using System;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 
 namespace Listary.FileAppPlugin.Tessoa
 {
@@ -51,9 +50,9 @@ namespace Listary.FileAppPlugin.Tessoa
                 return null;
             }
 
-            _host?.Logger?.LogDebug("Bound tessoa window {Handle} of process {ProcessId}",
-                                    hWnd, processId);
-            return new TessoaWindow(hWnd, processId);
+            PluginLog.Trace(_host?.Logger, "BindFileWindow({Handle}) -> pid {ProcessId}",
+                            hWnd, processId);
+            return new TessoaWindow(_host, hWnd, processId);
         }
     }
 }

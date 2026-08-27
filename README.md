@@ -58,6 +58,18 @@ tessoa.exe --print-cwd
 
 Exit code `0` prints a path, `1` means there is nothing to report.
 
+## Troubleshooting
+
+Listary keeps warnings and above in its log, so this plugin's messages are normally invisible.
+Put an empty file named `verbose.txt` next to the plugin DLL and restart Listary. `BindFileWindow`,
+`GetCurrentTab` and every `GetCurrentFolder` answer are then written to
+
+```
+%APPDATA%\Listary\UserProfile\Cache\<id>\ListaryLog.txt
+```
+
+That separates "Listary never asked" from "we answered nothing". Delete the file to go quiet.
+
 ## Scope
 
 Implemented: `IGetFolder` — tessoa as a source of opened folders.

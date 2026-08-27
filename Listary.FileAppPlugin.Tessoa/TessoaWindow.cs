@@ -14,19 +14,22 @@ namespace Listary.FileAppPlugin.Tessoa
     /// </summary>
     public class TessoaWindow : IFileWindow
     {
+        private readonly IFileAppPluginHost _host;
         private readonly int _processId;
 
         public IntPtr Handle { get; }
 
-        public TessoaWindow(IntPtr hWnd, int processId)
+        public TessoaWindow(IFileAppPluginHost host, IntPtr hWnd, int processId)
         {
+            _host = host;
             Handle = hWnd;
             _processId = processId;
         }
 
         public Task<IFileTab> GetCurrentTab()
         {
-            return Task.FromResult<IFileTab>(new TessoaTab(Handle, _processId));
+            PluginLog.Trace(_host?.Logger, "GetCurrentTab({Handle})", Handle);
+            return Task.FromResult<IFileTab>(new TessoaTab(_host, Handle, _processId));
         }
     }
 }
