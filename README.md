@@ -58,6 +58,11 @@ tessoa.exe --print-cwd
 
 Exit code `0` prints a path, `1` means there is nothing to report.
 
+## Updating an installed plugin
+
+Listary loads the plugin into its own process, so the DLL cannot be overwritten while it runs.
+Quit Listary (the `Listary.Service` process does not hold it), copy, then start Listary again.
+
 ## Troubleshooting
 
 Listary keeps warnings and above in its log, so this plugin's messages are normally invisible.
