@@ -7,7 +7,7 @@
   "DisplayName": "tessoa",
   "Authors": [ "Tessoa" ],
   "Description": "Listary file application plugin for tessoa, a GPU-accelerated file manager for Windows.",
-  "Homepage": "https://github.com/Tessoa/tessoa-listary",
+  "Homepage": "https://github.com/Tessoa/Listary.FileAppPlugin.Tessoa",
   "Icon": "Icon.png",
 
   "Api": "NetFramework",
