@@ -31,7 +31,7 @@ string and never guesses.
 
 ## Requirements
 
-- A tessoa build that serves the query pipe. Check with `tessoa.exe --print-cwd`.
+- tessoa 0.22.0 or later. Check with `tessoa.exe --print-cwd`.
 - Listary with file application plugin support.
 - .NET Framework 4.8.
 
