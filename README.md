@@ -45,8 +45,10 @@ Output: `Listary.FileAppPlugin.Tessoa\bin\Release\net48`
 
 ## Install
 
-Copy the output directory into `<Listary>\FileAppPlugins`, restart Listary, then enable the plugin
-under **Listary options → Integration**.
+Download the [latest release](https://github.com/Tessoa/Listary.FileAppPlugin.Tessoa/releases/latest)
+and unzip it, or build it yourself as above. Copy the `Listary.FileAppPlugin.Tessoa` folder into
+`<Listary>\FileAppPlugins`, restart Listary, then enable the plugin under
+**Listary options → Integration**.
 
 ## Check without Listary
 
