@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net48</TargetFramework>
+    <LangVersion>9.0</LangVersion>
+    <!-- 测试程序也充当只记录 argv 的假 tessoa，标记必须走真实 PE 资源读取。 -->
+    <Description>tessoa-file-app-api=1</Description>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../Listary.FileAppPlugin.Tessoa/Listary.FileAppPlugin.Tessoa.csproj" />
+  </ItemGroup>
+</Project>

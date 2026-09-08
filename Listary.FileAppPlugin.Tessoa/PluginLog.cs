@@ -49,7 +49,7 @@ namespace Listary.FileAppPlugin.Tessoa
         ///   possible way for a diagnostic switch to fail.
         /// </para>
         /// </summary>
-        private static string AssemblyDirectory()
+        internal static string AssemblyDirectory()
         {
             Assembly assembly = Assembly.GetExecutingAssembly();
 
