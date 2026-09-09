@@ -7,7 +7,9 @@ With this plugin, Listary knows which folder tessoa is showing. Quick Switch the
 dialogs to it, and the folder appears in the *Currently Opened Folders* menu.
 
 Version 0.2.0 also implements opening a folder, and opening a file's parent folder with that
-file selected.
+file selected, when Listary calls the plugin in a recognized tessoa window's search context.
+Listary's global launcher uses its own opening settings instead; installing this plugin does
+not make tessoa the destination of global search results.
 
 tessoa lands these the same way its own "go to" actions do: if the folder is already open in a
 tab it just focuses that tab (in any window), otherwise it opens a new tab in the focused tab
@@ -80,6 +82,52 @@ tessoa.exe --print-cwd
 ```
 
 Exit code `0` prints a path, `1` means there is nothing to report.
+
+## Global search setup
+
+In Listary 6.3.5.94, the global launcher and standalone file search use **Open Folder With**
+rather than this plugin's opening interfaces. The search context attached to a recognized
+tessoa window can use the plugin interfaces. Explorer replacement is a separate integration
+and does not demonstrate that Listary called the plugin.
+
+For folder results in global search, set both fields under **Options → General → Open Folder
+With** ([Listary documentation](https://help.listary.com/options-general)):
+
+| Field | Value |
+| --- | --- |
+| Path | The full path to the installed `tessoa.exe` |
+| Parameter | `"--open-window=%1"` |
+
+The default installation is `%LOCALAPPDATA%\tessoa\tessoa.exe`; expand `%LOCALAPPDATA%` to its
+actual directory when entering the executable path. A path without a parameter is insufficient:
+Listary falls back to the system folder handler when either field is empty.
+
+For file selection in global search, add a separate action under **Options → Actions**
+([Listary documentation](https://help.listary.com/options-actions)):
+
+| Field | Value |
+| --- | --- |
+| Title | Reveal in tessoa |
+| Path | The same full path to the installed `tessoa.exe` |
+| Parameter | `"--reveal-window={action_path}"` |
+| Hotkey scope | Listary, if assigning a shortcut |
+
+Select a file result, press **Ctrl+O**, and choose **Reveal in tessoa**. The built-in global
+**Open containing folder** action passes only the parent directory to **Open Folder With**;
+it loses the selected file's path. Changing that setting's parameter to `--reveal-window`
+therefore cannot fix file selection. The custom action must use `{action_path}`, including
+the filename, rather than `{action_path:parent}`.
+
+These settings invoke tessoa directly and do not require Explorer replacement. They also do
+not exercise the plugin DLL. To test the plugin itself, use Listary's plugin DevTools to call
+`IOpenFolder.OpenFolder` and `IOpenFolderAndSelectFile.OpenFolderAndSelectFile`, or use the
+search context attached to a recognized tessoa window. A global **Enter** or **Ctrl+Enter**
+test alone cannot establish whether the plugin works.
+
+For either route, repeat a folder request to check tab reuse, then reveal a file with spaces
+and non-ASCII characters in its name. Also reveal a file outside the initial visible rows:
+the file must be selected and scrolled into view. Merely opening its parent directory is not
+a successful reveal.
 
 ## Updating an installed plugin
 
