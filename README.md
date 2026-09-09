@@ -40,9 +40,9 @@ string and never guesses.
 ## Requirements
 
 - tessoa 0.22.0 or later. Check with `tessoa.exe --print-cwd`.
-- Opening/selecting requires a tessoa build with **file application API 1**. The original
-  0.24.1 release only supports reading the current folder. Build the companion tessoa changes
-  or install a later release that includes them; updating this DLL alone cannot add selection.
+- For opening folders and selecting files, use tessoa 0.24.2 or later with **file application
+  API 1**. The original 0.24.1 release only supports reading the current folder; updating this
+  DLL alone cannot add opening or selection support.
 - Listary with file application plugin support.
 - .NET Framework 4.8.
 
@@ -85,6 +85,8 @@ Exit code `0` prints a path, `1` means there is nothing to report.
 
 Listary loads the plugin into its own process, so the DLL cannot be overwritten while it runs.
 Quit Listary (the `Listary.Service` process does not hold it), copy, then start Listary again.
+Replace the existing tessoa plugin folder instead of keeping two copies. If it contains
+`tessoa-path.txt`, preserve that file and check that it still names the intended installation.
 
 ## Troubleshooting
 

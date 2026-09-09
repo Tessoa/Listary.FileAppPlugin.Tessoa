@@ -3,3 +3,7 @@ obj/
 .vs/
 *.user
 *.suo
+
+# Local development handoff files.
+/docs/tessoa-p0-handoff.md
+/docs/tessoa-p0-reference.patch
