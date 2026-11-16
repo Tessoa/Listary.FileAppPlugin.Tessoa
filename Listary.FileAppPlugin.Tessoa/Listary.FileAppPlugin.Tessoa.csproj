@@ -8,7 +8,7 @@
     <Company>Tessoa</Company>
     <Product>Listary file application plugin for tessoa</Product>
     <Copyright>Copyright (c) Tessoa</Copyright>
-    <Version>0.2.0</Version>
+    <Version>0.3.0</Version>
     <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
   </PropertyGroup>
 

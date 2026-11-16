@@ -33,12 +33,18 @@ namespace Listary.FileAppPlugin.Tessoa
             return Task.FromResult(true);
         }
 
-        // Where the folder lands is tessoa's call, not ours: it reuses an open tab when there
-        // is one and opens a new tab otherwise. Targeting one exact window or tab would need
-        // the window- and tab-level interfaces, and a forwarding protocol that carries a target.
-        public Task<bool> OpenFolder(string path) => _launcher.Open(path, select: false);
+        // Application level: where the folder lands is tessoa's call. It reuses an open tab when
+        // there is one and opens a new tab otherwise. The window- and tab-level interfaces on
+        // TessoaWindow and TessoaTab name the exact target instead.
+        public Task<bool> OpenFolder(string path) => OpenAtApplicationLevel(path, select: false);
 
-        public Task<bool> OpenFolderAndSelectFile(string path) => _launcher.Open(path, select: true);
+        public Task<bool> OpenFolderAndSelectFile(string path) => OpenAtApplicationLevel(path, select: true);
+
+        private Task<bool> OpenAtApplicationLevel(string path, bool select)
+        {
+            PluginLog.Trace(_host?.Logger, "Open(application, select: {Select})", select);
+            return _launcher.Open(path, select);
+        }
 
         public IFileWindow BindFileWindow(IntPtr hWnd)
         {
@@ -63,7 +69,7 @@ namespace Listary.FileAppPlugin.Tessoa
 
             PluginLog.Trace(_host?.Logger, "BindFileWindow({Handle}) -> pid {ProcessId}",
                             hWnd, processId);
-            return new TessoaWindow(_host, hWnd, processId);
+            return new TessoaWindow(_host, hWnd, processId, _launcher);
         }
     }
 }

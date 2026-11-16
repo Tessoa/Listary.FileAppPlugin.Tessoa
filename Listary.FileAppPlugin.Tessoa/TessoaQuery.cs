@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.IO.Pipes;
 using System.Text;
@@ -6,6 +8,40 @@ using System.Threading.Tasks;
 
 namespace Listary.FileAppPlugin.Tessoa
 {
+    /// <summary>One file tab as tessoa reports it.</summary>
+    internal sealed class TabInfo
+    {
+        /// <summary>tessoa's id for the tab. Stable while the tab lives, unique in the process.</summary>
+        public ulong Uid { get; }
+
+        /// <summary>Whether this is the window's current tab.</summary>
+        public bool IsCurrent { get; }
+
+        public string Folder { get; }
+
+        public TabInfo(ulong uid, bool isCurrent, string folder)
+        {
+            Uid = uid;
+            IsCurrent = isCurrent;
+            Folder = folder;
+        }
+    }
+
+    /// <summary>The answer to <c>query-tabs</c>.</summary>
+    internal sealed class TabList
+    {
+        /// <summary>File application API level of the running process.</summary>
+        public int Api { get; }
+
+        public IReadOnlyList<TabInfo> Tabs { get; }
+
+        public TabList(int api, IReadOnlyList<TabInfo> tabs)
+        {
+            Api = api;
+            Tabs = tabs;
+        }
+    }
+
     /// <summary>
     /// Client for tessoa's current-path query pipe.
     ///
@@ -54,10 +90,63 @@ namespace Listary.FileAppPlugin.Tessoa
         {
             // The pipe API used here is synchronous, so the call is moved off the caller's thread
             // rather than blocking it.
-            return Task.Run(() => Query(processId, hWnd));
+            return Task.Run(() => Query(processId, hWnd, "query-cwd"));
         }
 
-        private static string Query(int processId, IntPtr hWnd)
+        /// <summary>
+        /// Ask which folders the window <paramref name="hWnd"/> has open: one entry per file tab,
+        /// the current tab first.
+        /// </summary>
+        /// <returns>
+        /// <c>null</c> when the process does not understand the request. tessoa before file
+        /// application API 2 answers any request it does not know with an empty frame, while a
+        /// newer tessoa always starts its answer with an <c>api</c> line, even with no tabs.
+        /// </returns>
+        /// <remarks>
+        /// <code>
+        /// api 2
+        /// tab 17 c D:\Work
+        /// tab 23 b C:\Users\me\Downloads
+        /// </code>
+        /// The letter is <c>c</c> for the current tab, <c>v</c> for the front tab of another tab
+        /// group and <c>b</c> for a background tab. The path is the rest of the line.
+        /// </remarks>
+        public static Task<TabList> GetTabs(int processId, IntPtr hWnd)
+        {
+            return Task.Run(() => ParseTabs(Query(processId, hWnd, "query-tabs")));
+        }
+
+        internal static TabList ParseTabs(string answer)
+        {
+            if (string.IsNullOrEmpty(answer))
+            {
+                return null;
+            }
+            int api = 0;
+            var tabs = new List<TabInfo>();
+            foreach (string line in answer.Split('\n'))
+            {
+                if (line.StartsWith("api ", StringComparison.Ordinal))
+                {
+                    int.TryParse(line.Substring(4), NumberStyles.None, CultureInfo.InvariantCulture, out api);
+                    continue;
+                }
+                if (!line.StartsWith("tab ", StringComparison.Ordinal))
+                {
+                    continue; // Unknown lines are ignored, the same rule tessoa follows.
+                }
+                string[] parts = line.Split(new[] { ' ' }, 4);
+                if (parts.Length == 4 && parts[2].Length == 1 && parts[3].Length > 0
+                    && ulong.TryParse(parts[1], NumberStyles.None, CultureInfo.InvariantCulture, out ulong uid))
+                {
+                    tabs.Add(new TabInfo(uid, parts[2] == "c", parts[3]));
+                }
+            }
+            // An answer without an api line is not one this client understands.
+            return api > 0 ? new TabList(api, tabs) : null;
+        }
+
+        private static string Query(int processId, IntPtr hWnd, string op)
         {
             try
             {
@@ -68,7 +157,7 @@ namespace Listary.FileAppPlugin.Tessoa
 
                     byte[] body = Encoding.UTF8.GetBytes(
                         "v " + ProtocolVersion + "\n" +
-                        "op query-cwd\n" +
+                        "op " + op + "\n" +
                         "hwnd " + hWnd.ToInt64().ToString(System.Globalization.CultureInfo.InvariantCulture) + "\n");
 
                     byte[] request = new byte[4 + body.Length];

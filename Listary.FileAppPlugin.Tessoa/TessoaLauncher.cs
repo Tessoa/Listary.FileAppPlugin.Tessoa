@@ -33,7 +33,15 @@ namespace Listary.FileAppPlugin.Tessoa
 
         internal void RememberExecutable(string path) { _boundExecutable = path; }
 
-        internal Task<bool> Open(string path, bool select) => Task.Run(() =>
+        /// <param name="path">The folder to open, or the item to reveal.</param>
+        /// <param name="select">Reveal <paramref name="path"/> in its parent folder.</param>
+        /// <param name="scope">
+        /// Where to land, as one tessoa argument: <c>--in-window=&lt;hwnd&gt;</c> or
+        /// <c>--in-tab=&lt;hwnd&gt;[:&lt;tab id&gt;]</c>. <c>null</c> lets tessoa pick, the
+        /// application-level behaviour. Pass a scope only after the running process has reported
+        /// file application API 2 (see <see cref="TessoaQuery.GetTabs"/>).
+        /// </param>
+        internal Task<bool> Open(string path, bool select, string scope = null) => Task.Run(() =>
         {
             try
             {
@@ -60,25 +68,19 @@ namespace Listary.FileAppPlugin.Tessoa
                     return false;
                 }
 
-                var start = new ProcessStartInfo
+                string action = QuoteArgument((select ? "--reveal-window=" : "--open-window=") + fullPath);
+                int code = Launch(executable, scope == null ? action : action + " " + QuoteArgument(scope));
+                // Exit code 1 means the running instance did not take the request. With a scope
+                // that happens when the running instance predates it and drops the new request
+                // whole, so ask again without one rather than doing nothing.
+                if (code == 1 && scope != null)
                 {
-                    FileName = executable,
-                    Arguments = QuoteArgument((select ? "--reveal-window=" : "--open-window=") + fullPath),
-                    UseShellExecute = false,
-                    CreateNoWindow = true,
-                    WindowStyle = ProcessWindowStyle.Hidden
-                };
-                using (var process = Process.Start(start))
-                {
-                    if (process == null) return false;
-                    // A forwarding child exits within milliseconds, so a non-zero code means the
-                    // running instance did not take the request and we must not report success.
-                    // A cold-start process keeps running instead — do not wait out its GUI life.
-                    bool accepted = !process.WaitForExit(3500) || process.ExitCode == 0;
-                    if (!accepted)
-                        _logger?.LogWarning("[tessoa] The open request failed with exit code {ExitCode}", process.ExitCode);
-                    return accepted;
+                    _logger?.LogWarning("[tessoa] The running tessoa did not take {Scope}; opening without it", scope);
+                    code = Launch(executable, action);
                 }
+                if (code != 0)
+                    _logger?.LogWarning("[tessoa] The open request failed with exit code {ExitCode}", code);
+                return code == 0;
             }
             catch (Exception e) when (e is IOException || e is UnauthorizedAccessException
                                       || e is ArgumentException || e is System.ComponentModel.Win32Exception
@@ -88,6 +90,27 @@ namespace Listary.FileAppPlugin.Tessoa
                 return false;
             }
         });
+
+        /// <returns>The child's exit code, or 0 when it is still running.</returns>
+        private static int Launch(string executable, string arguments)
+        {
+            var start = new ProcessStartInfo
+            {
+                FileName = executable,
+                Arguments = arguments,
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                WindowStyle = ProcessWindowStyle.Hidden
+            };
+            using (var process = Process.Start(start))
+            {
+                if (process == null) return -1;
+                // A forwarding child exits within milliseconds, so a non-zero code means the
+                // running instance did not take the request and we must not report success.
+                // A cold-start process keeps running instead; do not wait out its GUI life.
+                return process.WaitForExit(3500) ? process.ExitCode : 0;
+            }
+        }
 
         private string FindExecutable()
         {
