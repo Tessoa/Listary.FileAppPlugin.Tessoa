@@ -230,7 +230,7 @@ unknown flags and opens a window, so the probe itself changes the user's screen.
 |---|---|
 | Reading the current folder (`query-cwd`) | The pipe exists. Available since tessoa 0.22.0. |
 | `--open-window=` / `--reveal-window=` (API 1) | The `Comments` field of the executable's version resource contains exactly `tessoa-file-app-api=1`. Read it from the file without starting it. |
-| `query-tabs`, `--in-window=`, `--in-tab=` (API 2) | Send `query-tabs` to the **running** process. A first line of `api 2` or higher means supported; an empty frame means not supported. |
+| `query-tabs`, `--in-window=`, `--in-tab=` (API 2) | Send `query-tabs` to the **running** process. A first line of `api 2` or higher means supported; an empty frame means not supported. Available since tessoa 0.31.2. |
 
 The `Comments` marker stays at `=1` on purpose, because existing integrations compare it for
 equality. API 2 is reported by the running process instead, which is also more accurate: if the

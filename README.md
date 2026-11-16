@@ -31,8 +31,8 @@ Version 0.3.0 adds the tab and window levels:
 - **Window-level opening stays in that window.** It switches to a tab of that window that
   already shows the folder, or opens one in its focused tab group.
 
-These need file application API 2 in the running tessoa (see Requirements). Against an older
-tessoa the plugin behaves as 0.2.0 did.
+These need file application API 2 in the running tessoa, available since tessoa 0.31.2 (see
+Requirements). Against an older tessoa the plugin behaves as 0.2.0 did.
 
 ### What Listary 6.3.5 actually calls
 
@@ -90,8 +90,8 @@ frame, which is how the plugin tells the two apart without launching anything.
 - For opening folders and selecting files, use tessoa 0.24.2 or later with **file application
   API 1**. The original 0.24.1 release only supports reading the current folder; updating this
   DLL alone cannot add opening or selection support.
-- For listing every tab and for window- and tab-level opening, use a tessoa that reports
-  **file application API 2** (the `api` line above). The PE `Comments` marker stays
+- For listing every tab and for window- and tab-level opening, use tessoa 0.31.2 or later,
+  which reports **file application API 2** (the `api` line above). The PE `Comments` marker stays
   `tessoa-file-app-api=1` so that plugin 0.2.0 keeps working with newer tessoa builds.
 - Listary with file application plugin support.
 - .NET Framework 4.8.
